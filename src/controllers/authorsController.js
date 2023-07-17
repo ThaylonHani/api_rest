@@ -1,78 +1,82 @@
+import { error404 } from '../error/error404.js';
 import authors from '../models/Author.js';
 
 class authorController {
-  static getAllAuthors = async (req, res) => {
+  static getAllAuthors = async (req, res, next) => {
     try {
       const authorsRes = await authors.find();
       res.status(200).json(authorsRes);
     } catch (err) {
-      res.status(500).json(err);
+      next(err);
     }
   };
 
-  static getAuthorById = async (req, res) => {
+  static getAuthorById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
       const author = await authors.findById(id);
-      res.status(200).send(author.toJSON());
-    } catch (error) {
-      res
-        .status(404)
-        .send({ message: `${error.message} - Autor não encontrado` });
-    }
-  };
-
-  static postAuthor = (req, res) => {
-    try {
-      const newAuthor = new authors(req.body);
-      newAuthor.save(res.status(201).send(newAuthor.toJSON()));
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Autor não cadastrado` });
-    }
-  };
-
-  static modifyAuthor = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-      await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send('Autor modificado com sucesso');
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Autor não modificado` });
-    }
-  };
-
-  static updateAuthor = async (req, res) => {
-    const { id } = req.params;
-    try {
-      if (req.body.name || req.body.nationality) {
-        await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-        res.status(200).send('Autor atualizado com sucesso');
+      if (author !== null) {
+        res.status(200).send(author.toJSON());
       } else {
-        throw new Error('Nome ou nacionalidade não informada');
+        next(new error404('Autor(a) não encontrado'));
       }
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Autor não atualizado` });
+      next(error);
     }
   };
 
-  static deleteAuthor = async (req, res) => {
+  static postAuthor = async (req, res, next) => {
+    try {
+      const newAuthor = new authors(req.body);
+      await newAuthor.save();
+      res.status(201).send(newAuthor.toJSON());
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static modifyAuthor = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-      await authors.findByIdAndDelete(id);
-      res.status(200).send('Autor deletado com sucesso');
+      const author = await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
+      if (author !== null) {
+        res.status(200).send(author.toJSON());
+      } else {
+        next(new error404('Autor(a) não encontrado'));
+      }
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Autor não deletado` });
+      next(error);
+    }
+  };
+
+  static updateAuthor = async (req, res, next) => {
+    const { id } = req.params;
+    try {
+      const author = await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
+      if (author !== null) {
+        res.status(200).send(author.toJSON());
+      } else {
+        next(new error404('Autor(a) não encontrado'));
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static deleteAuthor = async (req, res, next) => {
+    const { id } = req.params;
+
+    try {
+      const author = await authors.findByIdAndDelete(id);
+      if (author !== null) {
+        res.status(200).send(author.toJSON());
+      } else {
+        next(new error404('Autor(a) não encontrado'));
+      }
+    } catch (error) {
+      next(error);
     }
   };
 }

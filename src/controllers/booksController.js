@@ -1,79 +1,86 @@
+import { error404 } from '../error/error404.js';
 import books from '../models/Book.js';
 
 class BookController {
-  static getAllBooks = async (req, res) => {
+  static getAllBooks = async (req, res, next) => {
     try {
       const booksRes = await books.find().populate('author');
       res.status(200).json(booksRes);
-    } catch (err) {
-      res.status(500).json(err);
+    } catch (error) {
+      next(error);
     }
   };
 
-  static getBookById = async (req, res) => {
+  static getBookById = async (req, res, next) => {
     const { id } = req.params;
 
     try {
       const book = await books.findById(id).populate('author', 'name');
-      res.status(200).send(book.toJSON());
+      if (book !== null) {
+        res.status(200).send(book.toJSON());
+      } else {
+        next(new error404('Livro não encontrado'));
+      }
     } catch (error) {
-      res
-        .status(404)
-        .send({ message: `${error.message} - Livro não encontrado` });
+      next(error);
     }
   };
 
-  static postBook = (req, res) => {
+  static postBook = async (req, res, next) => {
     try {
       const newBook = new books(req.body);
-      newBook.save(res.status(201).send(newBook.toJSON()));
+      await newBook.save();
+      res.status(201).send(newBook.toJSON());
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Livro não cadastrado` });
+      next(error);
     }
   };
 
-  static modifyBook = async (req, res) => {
+  static modifyBook = async (req, res, next) => {
+    try {
+      const { id } = req.params;
+      const book = await books.findByIdAndUpdate(id, { $set: req.body }, { new: true }).populate('author', 'name');
+      if (book !== null) {
+        res.status(200).send(book.toJSON());
+      } else {
+        next(new error404('Livro não encontrado'));
+      }
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  static updateBook = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-      await books.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send('Livro modificado com sucesso');
+      const book = await books.findByIdAndUpdate(id, { $set: req.body }, { new: true });
+      if (book !== null) {
+        res.status(200).send(book.toJSON());
+      } else {
+        next(new error404('Livro não encontrado'));
+      }
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Livro não modificado` });
+      next(error);
     }
   };
 
-  static updateBook = async (req, res) => {
+  static deleteBook = async (req, res, next) => {
     const { id } = req.params;
 
     try {
-      await books.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send('Livro atualizado com sucesso');
+      const book = await books.findByIdAndDelete(id);
+      if (book !== null) {
+        res.status(200).send(book.toJSON());
+      } else {
+        next(new error404('Livro não encontrado'));
+      }
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Livro não atualizado` });
+      next(error);
     }
   };
 
-  static deleteBook = async (req, res) => {
-    const { id } = req.params;
-
-    try {
-      await books.findByIdAndDelete(id);
-      res.status(200).send('Livro deletado com sucesso');
-    } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Livro não deletado` });
-    }
-  };
-
-  static getByPublishingCompany = async (req, res) => {
+  static getByPublishingCompany = async (req, res, next) => {
     try {
       const publishingCompany = req.query.PublishingCompany;
       const bookRes = await books.find({
@@ -81,9 +88,7 @@ class BookController {
       });
       res.status(200).json(bookRes);
     } catch (error) {
-      res
-        .status(500)
-        .send({ message: `${error.message} - Livro não encontrado` });
+      next(error);
     }
   };
 }
