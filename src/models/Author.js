@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const authorSchema = new mongoose.Schema(
   {
@@ -7,8 +7,8 @@ const authorSchema = new mongoose.Schema(
     nationality: { type: String, required: true },
   },
   {
-    versionKey : false
-  }
+    versionKey: false,
+  },
 );
 const authors = mongoose.model('authors', authorSchema);
 

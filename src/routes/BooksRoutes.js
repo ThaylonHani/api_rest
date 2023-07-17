@@ -1,5 +1,5 @@
-import express from "express";
-import BookController from "../controllers/booksController.js";
+import express from 'express';
+import BookController from '../controllers/booksController.js';
 
 const router = express.Router();
 
@@ -10,5 +10,5 @@ router
   .post('/books', BookController.postBook)
   .put('/books/:id', BookController.modifyBook)
   .patch('/books/:id/', BookController.updateBook)
-  .delete('/books/:id', BookController.deleteBook)
-export default router; 
+  .delete('/books/:id', BookController.deleteBook);
+export default router;

@@ -1,4 +1,4 @@
-import authors from "../models/Author.js";
+import authors from '../models/Author.js';
 
 class authorController {
   static getAllAuthors = async (req, res) => {
@@ -11,7 +11,7 @@ class authorController {
   };
 
   static getAuthorById = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       const author = await authors.findById(id);
@@ -33,26 +33,28 @@ class authorController {
         .send({ message: `${error.message} - Autor não cadastrado` });
     }
   };
+
   static modifyAuthor = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send("Autor modificado com sucesso");
+      res.status(200).send('Autor modificado com sucesso');
     } catch (error) {
       res
         .status(500)
         .send({ message: `${error.message} - Autor não modificado` });
     }
   };
+
   static updateAuthor = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
     try {
       if (req.body.name || req.body.nationality) {
         await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-        res.status(200).send("Autor atualizado com sucesso");
+        res.status(200).send('Autor atualizado com sucesso');
       } else {
-        throw new Error("Nome ou nacionalidade não informada");
+        throw new Error('Nome ou nacionalidade não informada');
       }
     } catch (error) {
       res
@@ -60,12 +62,13 @@ class authorController {
         .send({ message: `${error.message} - Autor não atualizado` });
     }
   };
+
   static deleteAuthor = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       await authors.findByIdAndDelete(id);
-      res.status(200).send("Autor deletado com sucesso");
+      res.status(200).send('Autor deletado com sucesso');
     } catch (error) {
       res
         .status(500)

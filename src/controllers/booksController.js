@@ -1,4 +1,4 @@
-import books from "../models/Book.js";
+import books from '../models/Book.js';
 
 class BookController {
   static getAllBooks = async (req, res) => {
@@ -11,10 +11,10 @@ class BookController {
   };
 
   static getBookById = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
-      const book = await books.findById(id).populate('author','name');
+      const book = await books.findById(id).populate('author', 'name');
       res.status(200).send(book.toJSON());
     } catch (error) {
       res
@@ -33,36 +33,39 @@ class BookController {
         .send({ message: `${error.message} - Livro não cadastrado` });
     }
   };
+
   static modifyBook = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       await books.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send("Livro modificado com sucesso");
+      res.status(200).send('Livro modificado com sucesso');
     } catch (error) {
       res
         .status(500)
         .send({ message: `${error.message} - Livro não modificado` });
     }
   };
+
   static updateBook = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       await books.findByIdAndUpdate(id, { $set: req.body }, { new: true });
-      res.status(200).send("Livro atualizado com sucesso");
+      res.status(200).send('Livro atualizado com sucesso');
     } catch (error) {
       res
         .status(500)
         .send({ message: `${error.message} - Livro não atualizado` });
     }
   };
+
   static deleteBook = async (req, res) => {
-    const id = req.params.id;
+    const { id } = req.params;
 
     try {
       await books.findByIdAndDelete(id);
-      res.status(200).send("Livro deletado com sucesso");
+      res.status(200).send('Livro deletado com sucesso');
     } catch (error) {
       res
         .status(500)
@@ -72,17 +75,17 @@ class BookController {
 
   static getByPublishingCompany = async (req, res) => {
     try {
-      console.log(req.query);
-      const publishingCompany = req.query.PublishingCompany
-      const bookRes = await books.find({ 'publishing_company': publishingCompany });
+      const publishingCompany = req.query.PublishingCompany;
+      const bookRes = await books.find({
+        publishing_company: publishingCompany,
+      });
       res.status(200).json(bookRes);
     } catch (error) {
-      res.status(500)
-      .send({ message: `${error.message} - Livro não encontrado` });
+      res
+        .status(500)
+        .send({ message: `${error.message} - Livro não encontrado` });
     }
-    
-  }
-  
+  };
 }
 
 export default BookController;
