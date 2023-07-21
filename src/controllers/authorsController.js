@@ -1,11 +1,12 @@
 import { error404 } from '../error/error404.js';
-import authors from '../models/Author.js';
+import { authors } from '../models/index.js';
 
 class authorController {
   static getAllAuthors = async (req, res, next) => {
     try {
-      const authorsRes = await authors.find();
-      res.status(200).json(authorsRes);
+      const searchAuthors = authors.find();
+      req.result = searchAuthors;
+      next();
     } catch (err) {
       next(err);
     }
