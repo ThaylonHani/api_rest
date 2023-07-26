@@ -43,7 +43,7 @@ class authorController {
     try {
       const author = await authors.findByIdAndUpdate(id, { $set: req.body }, { new: true });
       if (author !== null) {
-        res.status(200).send(author.toJSON());
+        res.status(204).send(author.toJSON());
       } else {
         next(new error404('Autor(a) não encontrado'));
       }

@@ -6,7 +6,6 @@ const booksSchema = new mongoose.Schema({
   author: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'authors',
-    required: [true, 'Id do autor(a) é obrigatório'],
   },
   publishing_company: { type: String },
   pages: {

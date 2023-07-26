@@ -91,7 +91,7 @@ class BookController {
       const { id } = req.params;
       const book = await books.findByIdAndUpdate(id, { $set: req.body }, { new: true }).populate('author', 'name');
       if (book !== null) {
-        res.status(200).send(book.toJSON());
+        res.status(204).send(book.toJSON());
       } else {
         next(new error404('Livro não encontrado'));
       }

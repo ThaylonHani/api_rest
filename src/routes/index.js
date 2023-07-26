@@ -4,7 +4,7 @@ import authors from './AuthorsRoutes.js';
 
 const routes = (app) => {
   app.route('/').get((req, res) => {
-    res.status(200).send({ title: 'Node curse' });
+    res.send({ message: 'Página principal' });
   });
 
   app.use(
